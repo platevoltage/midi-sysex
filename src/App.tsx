@@ -1,16 +1,55 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css'
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from '@mui/material'
 
 function App() {
-  const [device, setDevice] = useState("Select Devices");
+  const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIInput>[]>([]);
+  const [deviceId, setDeviceId] = useState("0");
+  const [device, setDevice] = useState<MIDIInput>();
   const [channel, setChannel] = useState(1);
   const [priority, setPriority] = useState(0);
   const [root, setRoot] = useState(0);
 
+  useEffect(() => {
+    const _deviceList = [];
+    (async () =>  {
+      const midi = await navigator.requestMIDIAccess();
+      const _devices = midi.inputs.values();
+      console.log(_devices);
+      for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
+        _deviceList.push(_device);
+      }
+      console.log(_deviceList);
+      setDeviceList(_deviceList);
+    })();
+  },[]);
+
+  useEffect(() => {
+    (async () =>  {
+      const midi = await navigator.requestMIDIAccess();
+      const _device = midi.inputs.get(deviceId);
+      if (_device) {
+        setDevice(_device);
+        // Connect to the selected MIDI device
+        // _device.onmidimessage = onMIDIMessage;
+        console.log('Connected to MIDI device:', _device.name);
+        // alert('Connected to MIDI device: ' + _device.name);
+      } else {
+        // console.error('MIDI device not found:', selectedDeviceId);
+        alert('MIDI device not found. Check console for details.');
+      }
+    })();
+  },[deviceId]);
+
+  useEffect(() => {
+    console.log(device);
+  },[device]);
+
   const handleDeviceChange = (event: SelectChangeEvent) => {
-    setDevice(event.target.value as string);
+    const _device = event.target.value;
+    setDeviceId(_device);
+    console.log(_device);
   };
 
   const handleChannelChange = (event: SelectChangeEvent) => {
@@ -42,13 +81,15 @@ function App() {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={device}
+              value={deviceId.toString()}
               label="Device"
               onChange={handleDeviceChange}
             >
-              <MenuItem value={"test device 1"}>test device 1</MenuItem>
-              <MenuItem value={"test device 2"}>test device 2</MenuItem>
-              <MenuItem value={"test device 3"}>test device 3</MenuItem>
+              {
+                deviceList.map((device) =>
+                  <MenuItem value={device.value.id}>{device.value.name}</MenuItem>
+                )
+              }
             </Select>
           </FormControl>
         </Box>
