@@ -48,6 +48,14 @@ function App() {
     console.log(device);
   },[device]);
 
+  function byteLog(array: number[]) {
+    let string = "";
+    for (const byte of array) {
+      string += byte.toString(16) + " ";
+    }
+    console.log(string);
+  }
+
   const handleDeviceChange = (event: SelectChangeEvent) => {
     const _device = event.target.value;
     setDeviceId(_device);
@@ -71,10 +79,28 @@ function App() {
     if (device) {
       const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7];
       const sysExArray = Uint8Array.from(sysExData);
+      byteLog(sysExData);
       device.send(sysExArray);
     }
   }
-
+  const handleCalibration = () => {
+    console.log(device);
+    if (device) {
+      const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0F, 0xF7];
+      const sysExArray = Uint8Array.from(sysExData);
+      byteLog(sysExData);
+      device.send(sysExArray);
+    }
+  }
+  const handleQuickCalibration = () => {
+    console.log(device);
+    if (device) {
+      const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0A, 0xF7];
+      const sysExArray = Uint8Array.from(sysExData);
+      byteLog(sysExData);
+      device.send(sysExArray);
+    }
+  }
   const theme = createTheme({
     palette: {
       mode: 'dark',
@@ -181,7 +207,12 @@ function App() {
 
         <Box sx={{ minWidth: 120, padding: 1 }}>
           Calibration<br></br>
-          <Button variant="contained">Calibration</Button>
+          <Button variant="contained" onClick={handleCalibration}>Calibration</Button>
+        </Box>
+
+        <Box sx={{ minWidth: 120, padding: 1 }}>
+          Quick Calibration<br></br>
+          <Button variant="contained" onClick={handleQuickCalibration}>Quick Calibration</Button>
         </Box>
 
       </ThemeProvider>
