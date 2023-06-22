@@ -7,6 +7,7 @@ function App() {
   const [device, setDevice] = useState("Select Devices");
   const [channel, setChannel] = useState(1);
   const [priority, setPriority] = useState(0);
+  const [root, setRoot] = useState(0);
 
   const handleDeviceChange = (event: SelectChangeEvent) => {
     setDevice(event.target.value as string);
@@ -18,6 +19,10 @@ function App() {
 
   const handlePriorityChange = (event: SelectChangeEvent) => {
     setPriority(+event.target.value);
+  };
+
+  const handleRootChange = (event: SelectChangeEvent) => {
+    setRoot(+event.target.value);
   };
 
   const theme = createTheme({
@@ -85,7 +90,7 @@ function App() {
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={priority.toString()}
-              label="Device"
+              label="Priority"
               onChange={handlePriorityChange}
             >
               <MenuItem value={0}>Low Note (0)</MenuItem>
@@ -101,9 +106,9 @@ function App() {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={priority.toString()}
-              label="Device"
-              onChange={handlePriorityChange}
+              value={root.toString()}
+              label="Root-Octave"
+              onChange={handleRootChange}
             >
               <MenuItem value={0}>0</MenuItem>
               <MenuItem value={1}>1</MenuItem>
