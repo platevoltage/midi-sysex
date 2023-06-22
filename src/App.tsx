@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     const _deviceList = [];
     (async () =>  {
-      const midi = await navigator.requestMIDIAccess();
+      const midi = await navigator.requestMIDIAccess({sysex: true});
       const _devices = midi.outputs.values();
       console.log(_devices);
       for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
@@ -27,7 +27,7 @@ function App() {
 
   useEffect(() => {
     (async () =>  {
-      const midi = await navigator.requestMIDIAccess();
+      const midi = await navigator.requestMIDIAccess({sysex: true});
       // const permissions = await navigator.permissions.query({name: "midi", sysex: true});
       // console.log(permissions);
       const _device = midi.outputs.get(deviceId);
@@ -69,7 +69,7 @@ function App() {
   const handleReboot = () => {
     console.log(device);
     if (device) {
-      const sysExData = [0xF0, 0x7d, 0x08, 0x10, 0x0b, 0xF7];
+      const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7];
       const sysExArray = Uint8Array.from(sysExData);
       device.send(sysExArray);
     }
