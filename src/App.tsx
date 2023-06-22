@@ -4,9 +4,9 @@ import './App.css'
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from '@mui/material'
 
 function App() {
-  const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIInput>[]>([]);
+  const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIOutput>[]>([]);
   const [deviceId, setDeviceId] = useState("0");
-  const [device, setDevice] = useState<MIDIInput>();
+  const [device, setDevice] = useState<MIDIOutput>();
   const [channel, setChannel] = useState(1);
   const [priority, setPriority] = useState(0);
   const [root, setRoot] = useState(0);
@@ -15,7 +15,7 @@ function App() {
     const _deviceList = [];
     (async () =>  {
       const midi = await navigator.requestMIDIAccess();
-      const _devices = midi.inputs.values();
+      const _devices = midi.outputs.values();
       console.log(_devices);
       for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
         _deviceList.push(_device);
@@ -28,7 +28,9 @@ function App() {
   useEffect(() => {
     (async () =>  {
       const midi = await navigator.requestMIDIAccess();
-      const _device = midi.inputs.get(deviceId);
+      // const permissions = await navigator.permissions.query({name: "midi", sysex: true});
+      // console.log(permissions);
+      const _device = midi.outputs.get(deviceId);
       if (_device) {
         setDevice(_device);
         // Connect to the selected MIDI device
@@ -63,6 +65,15 @@ function App() {
   const handleRootChange = (event: SelectChangeEvent) => {
     setRoot(+event.target.value);
   };
+
+  const handleReboot = () => {
+    console.log(device);
+    if (device) {
+      const sysExData = [0xF0, 0x7d, 0x08, 0x10, 0x0b, 0xF7];
+      const sysExArray = Uint8Array.from(sysExData);
+      device.send(sysExArray);
+    }
+  }
 
   const theme = createTheme({
     palette: {
@@ -165,7 +176,7 @@ function App() {
 
         <Box sx={{ minWidth: 120, padding: 1 }}>
           Bootloader<br></br>
-          <Button variant="contained">Reboot</Button>
+          <Button variant="contained" onClick={handleReboot}>Reboot</Button>
         </Box>
 
         <Box sx={{ minWidth: 120, padding: 1 }}>
