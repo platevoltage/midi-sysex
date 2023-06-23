@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import "./App.css";
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button, IconButton } from "@mui/material";
 import Logo from "./assets/logo.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,7 +30,7 @@ function App() {
             }
         } catch (e) {
             console.error(e);
-            toast.error("Could not get MIDI devices");
+            toast.error("Could not get MIDI devices, make sure you are using a WebMIDI compatible browser.");
         }
     },[]);
 
@@ -83,7 +83,6 @@ function App() {
             byteLog(sysExData);
             device.send(sysExArray);
         }
-
     }
 
     function handlePriorityChange(event: SelectChangeEvent) {
@@ -148,7 +147,15 @@ function App() {
                     <img src={Logo} alt="" style={{width: 200, margin: "1em"}}/>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "center"}}>
-                    <Box sx={{ minWidth: 180, padding: 2 }}>
+                    <Box sx={{ paddingTop: 3, margin: 0 }}>
+                        <IconButton onClick={getDeviceList}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                            </svg>
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ minWidth: 180, paddingTop: 2, paddingRight: 2, paddingLeft: 1 }}>
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Device</InputLabel>
                             <Select
@@ -251,7 +258,7 @@ function App() {
 
                 </Box>
 
-                <ToastContainer theme="dark" autoClose={3000}/>
+                <ToastContainer theme="dark" autoClose={2000}/>
             </ThemeProvider>
         </main>
     );
