@@ -135,16 +135,28 @@ function App() {
         palette: {
             mode: "dark",
             primary: {
-                main: "#fad761",
+                main: "#f8d96f",
+            },
+            background: {
+                paper: "#1c252c",
             },
         },
+        
+
     });
+
 
     return (
         <main>
             <ThemeProvider theme={theme}>
                 <Box sx={{ display: "flex", justifyContent: "center"}}>
                     <img src={Logo} alt="" style={{width: 200, margin: "1em"}}/>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "center", margin: 0}}>
+                    <span>MSW-810 Synthesizer MIDI configuration</span>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "center"}}>
+                    <span style={{fontWeight: 700, fontSize: ".8em"}}>USE USB MIDI ONLY TO CONNECT</span>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "center"}}>
                     <Box sx={{ paddingTop: 3, margin: 0 }}>

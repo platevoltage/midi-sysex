@@ -1,16 +1,17 @@
 #root {
   --toastify-toast-width: 400px;
-  --toastify-color-dark: #222228;
-  --toastify-color-success: #fad761;
+  --toastify-color-dark: #1c252c;
+  --toastify-color-success: #f8d96f;
   --toastify-color-progress-success: var(--toastify-color-success);
   --toastify-icon-color-success: var(--toastify-color-success);
 }
 
 body {
   background-color: #111118;
-  color: #ffffff;
+  color: #AEAFB3;
   display: flex;
   justify-content: center;
+  /* font-size: 1em; */
 }
 
 
