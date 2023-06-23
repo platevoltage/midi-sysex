@@ -23,7 +23,7 @@ function App() {
             for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
                 _deviceList.push(_device);
             }
-            console.log(_deviceList);
+            // console.log(_deviceList);
             setDeviceList(_deviceList);
             if (_deviceList.length > 0) {
                 setDeviceId(_deviceList[0].value.id);
@@ -45,7 +45,7 @@ function App() {
         if (_device) {
             setDevice(_device);
             // Connect to the selected MIDI device
-            console.log("Connected to MIDI device:", _device.name);
+            // console.log("Connected to MIDI device:", _device.name);
             toast.success("Connected to MIDI device: " + _device.name);
         } else {
             console.error("MIDI device not found:", deviceId);
@@ -145,7 +145,7 @@ function App() {
                     <Box sx={{ paddingTop: 3, margin: 0 }}>
                         <IconButton onClick={getDeviceList}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
                                 <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
                             </svg>
                         </IconButton>
