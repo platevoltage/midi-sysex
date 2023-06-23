@@ -16,11 +16,11 @@ function App() {
     (async () =>  {
       const midi = await navigator.requestMIDIAccess({sysex: true});
       const _devices = midi.outputs.values();
-      console.log(_devices);
+      // console.log(_devices);
       for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
         _deviceList.push(_device);
       }
-      console.log(_deviceList);
+      // console.log(_deviceList);
       setDeviceList(_deviceList);
     })();
   },[]);
@@ -45,13 +45,13 @@ function App() {
   },[deviceId]);
 
   useEffect(() => {
-    console.log(device);
+    // console.log(device);
   },[device]);
 
   function byteLog(array: number[]) {
     let string = "";
     for (const byte of array) {
-      string += byte.toString(16) + " ";
+      string += byte.toString(16).padStart(2,"0")  + " ";
     }
     console.log(string);
   }
@@ -59,23 +59,45 @@ function App() {
   const handleDeviceChange = (event: SelectChangeEvent) => {
     const _device = event.target.value;
     setDeviceId(_device);
-    console.log(_device);
+    // console.log(_device);
   };
 
   const handleChannelChange = (event: SelectChangeEvent) => {
-    setChannel(+event.target.value);
+    const _channel = +event.target.value;
+    setChannel(_channel);
+    if (device) {
+      const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0C, _channel-1, 0xF7];
+      const sysExArray = Uint8Array.from(sysExData);
+      byteLog(sysExData);
+      device.send(sysExArray);
+    }
+
   };
 
   const handlePriorityChange = (event: SelectChangeEvent) => {
-    setPriority(+event.target.value);
+    const _priority = +event.target.value;
+    setPriority(_priority);
+    if (device) {
+      const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0E, _priority, 0xF7];
+      const sysExArray = Uint8Array.from(sysExData);
+      byteLog(sysExData);
+      device.send(sysExArray);
+    }
   };
 
   const handleRootChange = (event: SelectChangeEvent) => {
-    setRoot(+event.target.value);
+    const _root = +event.target.value;
+    setRoot(_root);
+    if (device) {
+      const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0D, _root, 0xF7];
+      const sysExArray = Uint8Array.from(sysExData);
+      byteLog(sysExData);
+      device.send(sysExArray);
+    }
   };
 
   const handleReboot = () => {
-    console.log(device);
+    // console.log(device);
     if (device) {
       const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7];
       const sysExArray = Uint8Array.from(sysExData);
@@ -84,7 +106,7 @@ function App() {
     }
   }
   const handleCalibration = () => {
-    console.log(device);
+    // console.log(device);
     if (device) {
       const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0F, 0xF7];
       const sysExArray = Uint8Array.from(sysExData);
@@ -93,7 +115,7 @@ function App() {
     }
   }
   const handleQuickCalibration = () => {
-    console.log(device);
+    // console.log(device);
     if (device) {
       const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0A, 0xF7];
       const sysExArray = Uint8Array.from(sysExData);
