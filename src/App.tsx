@@ -74,8 +74,10 @@ function App() {
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
+            return true;
         } else {
             toast.error("ERROR: No Device Selected");
+            return false;
         }
     }
 
@@ -86,20 +88,20 @@ function App() {
 
     function handleChannelChange(event: SelectChangeEvent) {
         const _channel = event.target.value;
-        setChannel(_channel);
-        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel - 1, 0xF7]);
+        const success = sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel - 1, 0xF7]);
+        if (success) setChannel(_channel);
     }
 
     function handlePriorityChange(event: SelectChangeEvent) {
         const _priority = event.target.value;
-        setPriority(_priority);
-        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0E, +_priority, 0xF7]);
+        const success = sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0E, +_priority, 0xF7]);
+        if (success) setPriority(_priority);
     }
 
     function handleRootChange(event: SelectChangeEvent) {
         const _root = event.target.value;
-        setRoot(_root);
-        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0D, +_root, 0xF7]);
+        const success = sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0D, +_root, 0xF7]);
+        if (success) setRoot(_root);
     }
 
     function handleReboot() {
