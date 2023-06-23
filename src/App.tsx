@@ -5,7 +5,7 @@ import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Butt
 
 function App() {
   const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIOutput>[]>([]);
-  const [deviceId, setDeviceId] = useState("0");
+  const [deviceId, setDeviceId] = useState<string>("0");
   const [device, setDevice] = useState<MIDIOutput>();
   const [channel, setChannel] = useState(1);
   const [priority, setPriority] = useState(0);
@@ -20,28 +20,33 @@ function App() {
       for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
         _deviceList.push(_device);
       }
-      // console.log(_deviceList);
+      console.log(_deviceList);
       setDeviceList(_deviceList);
+      if (_deviceList.length > 0) {
+        setDeviceId(_deviceList[0].value.id);
+      }
     })();
   },[]);
 
   useEffect(() => {
-    (async () =>  {
-      const midi = await navigator.requestMIDIAccess({sysex: true});
-      // const permissions = await navigator.permissions.query({name: "midi", sysex: true});
-      // console.log(permissions);
-      const _device = midi.outputs.get(deviceId);
-      if (_device) {
-        setDevice(_device);
-        // Connect to the selected MIDI device
-        // _device.onmidimessage = onMIDIMessage;
-        console.log('Connected to MIDI device:', _device.name);
-        // alert('Connected to MIDI device: ' + _device.name);
-      } else {
-        // console.error('MIDI device not found:', selectedDeviceId);
-        alert('MIDI device not found. Check console for details.');
-      }
-    })();
+    if (deviceId !== "0") {
+      (async () =>  {
+        const midi = await navigator.requestMIDIAccess({sysex: true});
+        // const permissions = await navigator.permissions.query({name: "midi", sysex: true});
+        // console.log(permissions);
+        const _device = midi.outputs.get(deviceId);
+        if (_device) {
+          setDevice(_device);
+          // Connect to the selected MIDI device
+          // _device.onmidimessage = onMIDIMessage;
+          console.log('Connected to MIDI device:', _device.name);
+          // alert('Connected to MIDI device: ' + _device.name);
+        } else {
+          // console.error('MIDI device not found:', selectedDeviceId);
+          alert('MIDI device not found. Check console for details.');
+        }
+      })();
+    }
   },[deviceId]);
 
   useEffect(() => {
@@ -133,20 +138,22 @@ function App() {
   return (
     <main>
       <ThemeProvider theme={theme}>
-
-        <Box sx={{ minWidth: 120, padding: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center"}}>
+        <Box sx={{ minWidth: 180, padding: 2 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Device</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={deviceId.toString()}
+              value={deviceId === "0" ? "" : deviceId}
               label="Device"
               onChange={handleDeviceChange}
             >
               {
-                deviceList.map((device) =>
-                  <MenuItem value={device.value.id}>{device.value.name}</MenuItem>
+                deviceList.map((device, i) =>
+                // <div key={i}>
+                  <MenuItem key={i} value={device.value.id}>{device.value.name}</MenuItem>
+                // </div>
                 )
               }
             </Select>
@@ -183,14 +190,14 @@ function App() {
           </FormControl>
         </Box>
 
-        <Box sx={{ minWidth: 150, padding: 2 }}>
+        <Box sx={{ minWidth: 280, padding: 2 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Note Priority</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={priority.toString()}
-              label="Priority"
+              label="Note Priority"
               onChange={handlePriorityChange}
             >
               <MenuItem value={0}>Low Note (0)</MenuItem>
@@ -200,14 +207,14 @@ function App() {
           </FormControl>
         </Box>
 
-        <Box sx={{ minWidth: 150, padding: 2 }}>
+        <Box sx={{ minWidth: 120, padding: 2 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Root Octave</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={root.toString()}
-              label="Root-Octave"
+              label="Root Octave"
               onChange={handleRootChange}
             >
               <MenuItem value={0}>0</MenuItem>
@@ -220,21 +227,21 @@ function App() {
             </Select>
           </FormControl>
         </Box>
-
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "center"}}>
 
         <Box sx={{ minWidth: 120, padding: 1 }}>
-          Bootloader<br></br>
-          <Button variant="contained" onClick={handleReboot}>Reboot</Button>
+          <Button variant="contained" onClick={handleReboot}>Reboot to Bootloader</Button>
         </Box>
 
         <Box sx={{ minWidth: 120, padding: 1 }}>
-          Calibration<br></br>
           <Button variant="contained" onClick={handleCalibration}>Calibration</Button>
         </Box>
 
         <Box sx={{ minWidth: 120, padding: 1 }}>
-          Quick Calibration<br></br>
           <Button variant="contained" onClick={handleQuickCalibration}>Quick Calibration</Button>
+        </Box>
+
         </Box>
 
       </ThemeProvider>
