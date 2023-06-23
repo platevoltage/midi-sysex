@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import "./App.css";
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button, Alert } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from "@mui/material";
 import Logo from "./assets/logo.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,21 +13,26 @@ function App() {
     const [channel, setChannel] = useState(1);
     const [priority, setPriority] = useState(0);
     const [root, setRoot] = useState(0);
-    const [alert, setAlert] = useState<null | string>(null);
 
     useEffect(() => {
         const _deviceList = [];
         (async () =>  {
-            const midi = await navigator.requestMIDIAccess({sysex: true});
-            const _devices = midi.outputs.values();
-            // console.log(_devices);
-            for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
-                _deviceList.push(_device);
-            }
-            console.log(_deviceList);
-            setDeviceList(_deviceList);
-            if (_deviceList.length > 0) {
-                setDeviceId(_deviceList[0].value.id);
+            try {
+
+                const midi = await navigator.requestMIDIAccess({sysex: true});
+                const _devices = midi.outputs.values();
+                // console.log(_devices);
+                for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
+                    _deviceList.push(_device);
+                }
+                console.log(_deviceList);
+                setDeviceList(_deviceList);
+                if (_deviceList.length > 0) {
+                    setDeviceId(_deviceList[0].value.id);
+                }
+            } catch (e) {
+                console.error(e);
+                toast.error("Could not get MIDI devices");
             }
         })();
     },[]);
@@ -44,10 +49,11 @@ function App() {
                     // Connect to the selected MIDI device
                     // _device.onmidimessage = onMIDIMessage;
                     console.log("Connected to MIDI device:", _device.name);
+                    toast.success("Connected to MIDI device: " + _device.name);
                     // alert('Connected to MIDI device: ' + _device.name);
                 } else {
-                    // console.error('MIDI device not found:', selectedDeviceId);
-                    // alert('MIDI device not found. Check console for details.');
+                    console.error("MIDI device not found:", deviceId);
+                    toast.error("MIDI device not found. Check console for details.");
                 }
             })();
         }
@@ -139,6 +145,9 @@ function App() {
     const theme = createTheme({
         palette: {
             mode: "dark",
+            primary: {
+                main: "#fad761",
+            },
         },
     });
 
