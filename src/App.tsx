@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css'
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button, Alert, AlertTitle } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button, Alert } from '@mui/material'
 import Logo from './assets/logo.png'
 
 function App() {
