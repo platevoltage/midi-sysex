@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import "./App.css";
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from "@mui/material";
@@ -14,55 +14,50 @@ function App() {
     const [priority, setPriority] = useState(0);
     const [root, setRoot] = useState(0);
 
-    useEffect(() => {
-        const _deviceList = [];
-        (async () =>  {
-            try {
 
-                const midi = await navigator.requestMIDIAccess({sysex: true});
-                const _devices = midi.outputs.values();
-                // console.log(_devices);
-                for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
-                    _deviceList.push(_device);
-                }
-                console.log(_deviceList);
-                setDeviceList(_deviceList);
-                if (_deviceList.length > 0) {
-                    setDeviceId(_deviceList[0].value.id);
-                }
-            } catch (e) {
-                console.error(e);
-                toast.error("Could not get MIDI devices");
+    const getDeviceList = useCallback(async () => {
+        const _deviceList = [];
+        try {
+            const midi = await navigator.requestMIDIAccess({sysex: true});
+            const _devices = midi.outputs.values();
+            for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
+                _deviceList.push(_device);
             }
-        })();
+            console.log(_deviceList);
+            setDeviceList(_deviceList);
+            if (_deviceList.length > 0) {
+                setDeviceId(_deviceList[0].value.id);
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Could not get MIDI devices");
+        }
     },[]);
 
+
     useEffect(() => {
-        if (deviceId !== "0") {
-            (async () =>  {
-                const midi = await navigator.requestMIDIAccess({sysex: true});
-                // const permissions = await navigator.permissions.query({name: "midi", sysex: true});
-                // console.log(permissions);
-                const _device = midi.outputs.get(deviceId);
-                if (_device) {
-                    setDevice(_device);
-                    // Connect to the selected MIDI device
-                    // _device.onmidimessage = onMIDIMessage;
-                    console.log("Connected to MIDI device:", _device.name);
-                    toast.success("Connected to MIDI device: " + _device.name);
-                    // alert('Connected to MIDI device: ' + _device.name);
-                } else {
-                    console.error("MIDI device not found:", deviceId);
-                    toast.error("MIDI device not found. Check console for details.");
-                }
-            })();
+        getDeviceList();
+    },[getDeviceList]);
+
+    const getDevice = useCallback(async () => {
+        const midi = await navigator.requestMIDIAccess({sysex: true});
+        const _device = midi.outputs.get(deviceId);
+        if (_device) {
+            setDevice(_device);
+            // Connect to the selected MIDI device
+            console.log("Connected to MIDI device:", _device.name);
+            toast.success("Connected to MIDI device: " + _device.name);
+        } else {
+            console.error("MIDI device not found:", deviceId);
+            toast.error("MIDI device not found. Check console for details.");
         }
     },[deviceId]);
 
     useEffect(() => {
-    // console.log(device);
-    },[device]);
-
+        if (deviceId !== "0") {
+            getDevice();
+        }
+    },[deviceId, getDevice]);
 
     function byteLog(array: number[]) {
         let string = "";
@@ -71,29 +66,27 @@ function App() {
         }
         string = string.toUpperCase();
         console.log(string);
-        // setAlert("Sysex sent: " + string);
         toast.success("Sysex sent: " + string);
     }
 
-    const handleDeviceChange = (event: SelectChangeEvent) => {
+    function handleDeviceChange(event: SelectChangeEvent) {
         const _device = event.target.value;
         setDeviceId(_device);
-    // console.log(_device);
-    };
+    }
 
-    const handleChannelChange = (event: SelectChangeEvent) => {
+    function handleChannelChange(event: SelectChangeEvent) {
         const _channel = +event.target.value;
         setChannel(_channel);
         if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0C, _channel-1, 0xF7];
+            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0C, _channel - 1, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
         }
 
-    };
+    }
 
-    const handlePriorityChange = (event: SelectChangeEvent) => {
+    function handlePriorityChange(event: SelectChangeEvent) {
         const _priority = +event.target.value;
         setPriority(_priority);
         if (device) {
@@ -102,9 +95,9 @@ function App() {
             byteLog(sysExData);
             device.send(sysExArray);
         }
-    };
+    }
 
-    const handleRootChange = (event: SelectChangeEvent) => {
+    function handleRootChange(event: SelectChangeEvent) {
         const _root = +event.target.value;
         setRoot(_root);
         if (device) {
@@ -113,35 +106,32 @@ function App() {
             byteLog(sysExData);
             device.send(sysExArray);
         }
-    };
+    }
 
-    const handleReboot = () => {
-    // console.log(device);
+    function handleReboot() {
         if (device) {
             const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
         }
-    };
-    const handleCalibration = () => {
-    // console.log(device);
+    }
+    function handleCalibration() {
         if (device) {
             const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0F, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
         }
-    };
-    const handleQuickCalibration = () => {
-    // console.log(device);
+    }
+    function handleQuickCalibration() {
         if (device) {
             const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0A, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
         }
-    };
+    }
     const theme = createTheme({
         palette: {
             mode: "dark",
