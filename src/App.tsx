@@ -30,7 +30,7 @@ function App() {
             }
         } catch (e) {
             console.error(e);
-            toast.error("Could not get MIDI devices, make sure you are using a WebMIDI compatible browser.");
+            toast.error("ERROR: Could not get MIDI devices, make sure you are using a WebMIDI compatible browser.");
         }
     },[]);
 
@@ -49,7 +49,7 @@ function App() {
             toast.success("Connected to MIDI device: " + _device.name);
         } else {
             console.error("MIDI device not found:", deviceId);
-            toast.error("MIDI device not found. Check console for details.");
+            toast.error("ERROR: MIDI device not found. Check console for details.");
         }
     },[deviceId]);
 
@@ -69,6 +69,16 @@ function App() {
         toast.success("Sysex sent: " + string);
     }
 
+    function sendSysEx(sysExData: number[]) {
+        if (device) {
+            const sysExArray = Uint8Array.from(sysExData);
+            byteLog(sysExData);
+            device.send(sysExArray);
+        } else {
+            toast.error("ERROR: No Device Selected");
+        }
+    }
+
     function handleDeviceChange(event: SelectChangeEvent) {
         const _device = event.target.value;
         setDeviceId(_device);
@@ -77,60 +87,31 @@ function App() {
     function handleChannelChange(event: SelectChangeEvent) {
         const _channel = event.target.value;
         setChannel(_channel);
-        if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel - 1, 0xF7];
-            const sysExArray = Uint8Array.from(sysExData);
-            byteLog(sysExData);
-            device.send(sysExArray);
-        }
+        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel - 1, 0xF7]);
     }
 
     function handlePriorityChange(event: SelectChangeEvent) {
         const _priority = event.target.value;
         setPriority(_priority);
-        if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0E, +_priority, 0xF7];
-            const sysExArray = Uint8Array.from(sysExData);
-            byteLog(sysExData);
-            device.send(sysExArray);
-        }
+        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0E, +_priority, 0xF7]);
     }
 
     function handleRootChange(event: SelectChangeEvent) {
         const _root = event.target.value;
         setRoot(_root);
-        if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0D, +_root, 0xF7];
-            const sysExArray = Uint8Array.from(sysExData);
-            byteLog(sysExData);
-            device.send(sysExArray);
-        }
+        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0D, +_root, 0xF7]);
     }
 
     function handleReboot() {
-        if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7];
-            const sysExArray = Uint8Array.from(sysExData);
-            byteLog(sysExData);
-            device.send(sysExArray);
-        }
+        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7]);
     }
     function handleCalibration() {
-        if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0F, 0xF7];
-            const sysExArray = Uint8Array.from(sysExData);
-            byteLog(sysExData);
-            device.send(sysExArray);
-        }
+        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0F, 0xF7]);
     }
     function handleQuickCalibration() {
-        if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0A, 0xF7];
-            const sysExArray = Uint8Array.from(sysExData);
-            byteLog(sysExData);
-            device.send(sysExArray);
-        }
+        sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0A, 0xF7]);
     }
+
     const theme = createTheme({
         palette: {
             mode: "dark",
