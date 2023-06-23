@@ -10,9 +10,9 @@ function App() {
     const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIOutput>[]>([]);
     const [deviceId, setDeviceId] = useState<string>("0");
     const [device, setDevice] = useState<MIDIOutput>();
-    const [channel, setChannel] = useState(1);
-    const [priority, setPriority] = useState(0);
-    const [root, setRoot] = useState(0);
+    const [channel, setChannel] = useState("");
+    const [priority, setPriority] = useState("");
+    const [root, setRoot] = useState("");
 
 
     const getDeviceList = useCallback(async () => {
@@ -75,10 +75,10 @@ function App() {
     }
 
     function handleChannelChange(event: SelectChangeEvent) {
-        const _channel = +event.target.value;
+        const _channel = event.target.value;
         setChannel(_channel);
         if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0C, _channel - 1, 0xF7];
+            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel - 1, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
@@ -86,10 +86,10 @@ function App() {
     }
 
     function handlePriorityChange(event: SelectChangeEvent) {
-        const _priority = +event.target.value;
+        const _priority = event.target.value;
         setPriority(_priority);
         if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0E, _priority, 0xF7];
+            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0E, +_priority, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
@@ -97,10 +97,10 @@ function App() {
     }
 
     function handleRootChange(event: SelectChangeEvent) {
-        const _root = +event.target.value;
+        const _root = event.target.value;
         setRoot(_root);
         if (device) {
-            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0D, _root, 0xF7];
+            const sysExData = [0xF0, 0x7D, 0x08, 0x10, 0x0D, +_root, 0xF7];
             const sysExArray = Uint8Array.from(sysExData);
             byteLog(sysExData);
             device.send(sysExArray);
@@ -178,6 +178,7 @@ function App() {
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Channel</InputLabel>
                             <Select
+                                
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 value={channel.toString()}
@@ -204,7 +205,7 @@ function App() {
                         </FormControl>
                     </Box>
 
-                    <Box sx={{ minWidth: 280, padding: 2 }}>
+                    <Box sx={{ minWidth: 150, padding: 2 }}>
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Note Priority</InputLabel>
                             <Select
@@ -221,7 +222,7 @@ function App() {
                         </FormControl>
                     </Box>
 
-                    <Box sx={{ minWidth: 120, padding: 2 }}>
+                    <Box sx={{ minWidth: 140, padding: 2 }}>
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Root Octave</InputLabel>
                             <Select
