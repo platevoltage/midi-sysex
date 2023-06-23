@@ -150,7 +150,7 @@ function App() {
         <main>
             <ThemeProvider theme={theme}>
                 <Box sx={{ display: "flex", justifyContent: "center"}}>
-                    <img src={Logo} alt="" style={{width: 200, margin: "1em"}}/>
+                    <img src={Logo} alt="Michigan Synth Works logo" style={{width: 200, margin: "1em"}}/>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "center", margin: 0}}>
                     <span>MSW-810 Synthesizer MIDI configuration</span>
