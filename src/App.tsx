@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css'
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button, Alert, AlertTitle } from '@mui/material'
 import Logo from './assets/logo.png'
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
   const [channel, setChannel] = useState(1);
   const [priority, setPriority] = useState(0);
   const [root, setRoot] = useState(0);
+  const [alert, setAlert] = useState<null | string>(null);
 
   useEffect(() => {
     const _deviceList = [];
@@ -44,7 +45,7 @@ function App() {
           // alert('Connected to MIDI device: ' + _device.name);
         } else {
           // console.error('MIDI device not found:', selectedDeviceId);
-          alert('MIDI device not found. Check console for details.');
+          // alert('MIDI device not found. Check console for details.');
         }
       })();
     }
@@ -59,7 +60,9 @@ function App() {
     for (const byte of array) {
       string += byte.toString(16).padStart(2,"0")  + " ";
     }
+    string = string.toUpperCase();
     console.log(string);
+    setAlert("Sysex sent: " + string);
   }
 
   const handleDeviceChange = (event: SelectChangeEvent) => {
@@ -247,6 +250,10 @@ function App() {
         </Box>
 
         </Box>
+
+        {alert && <Alert severity="info">
+          {alert}
+        </Alert>}
 
       </ThemeProvider>
     </main>
