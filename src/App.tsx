@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css'
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button } from '@mui/material'
+import Logo from './assets/logo.png'
 
 function App() {
   const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIOutput>[]>([]);
@@ -138,6 +139,9 @@ function App() {
   return (
     <main>
       <ThemeProvider theme={theme}>
+      <Box sx={{ display: "flex", justifyContent: "center"}}>
+      <img src={Logo} alt="" style={{width: 200, margin: "1em"}}/>
+      </Box>
         <Box sx={{ display: "flex", justifyContent: "center"}}>
         <Box sx={{ minWidth: 180, padding: 2 }}>
           <FormControl fullWidth>
