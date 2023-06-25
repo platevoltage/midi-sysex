@@ -1,31 +1,29 @@
 import { useState, useEffect, useCallback } from "react";
-import "./App.css";
+import { ToastContainer, toast } from "react-toastify";
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Button, IconButton } from "@mui/material";
 import Logo from "./assets/logo.png";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 
 function App() {
-    const [deviceList, setDeviceList] = useState<IteratorYieldResult<MIDIOutput>[]>([]);
-    const [deviceId, setDeviceId] = useState<string>("0");
+    const [deviceList, setDeviceList] = useState<MIDIOutput[]>([]);
+    const [deviceId, setDeviceId] = useState("");
     const [device, setDevice] = useState<MIDIOutput>();
     const [channel, setChannel] = useState("");
     const [priority, setPriority] = useState("");
     const [root, setRoot] = useState("");
 
-
     const getDeviceList = useCallback(async () => {
-        const _deviceList = [];
         try {
+            const _deviceList = [];
             const midi = await navigator.requestMIDIAccess({sysex: true});
             const _devices = midi.outputs.values();
-            for (let _device = _devices.next(); _device && !_device.done; _device = _devices.next()) {
+            for (const _device of _devices) {
                 _deviceList.push(_device);
             }
-            // console.log(_deviceList);
             setDeviceList(_deviceList);
             if (_deviceList.length > 0) {
-                setDeviceId(_deviceList[0].value.id);
+                setDeviceId(_deviceList[0].id);
             }
         } catch (e) {
             console.error(e);
@@ -33,18 +31,11 @@ function App() {
         }
     },[]);
 
-
-    useEffect(() => {
-        getDeviceList();
-    },[getDeviceList]);
-
-    const getDevice = useCallback(async () => {
+    const connectToDevice = useCallback(async () => {
         const midi = await navigator.requestMIDIAccess({sysex: true});
         const _device = midi.outputs.get(deviceId);
         if (_device) {
             setDevice(_device);
-            // Connect to the selected MIDI device
-            // console.log("Connected to MIDI device:", _device.name);
             toast.success("Connected to MIDI device: " + _device.name);
         } else {
             console.error("MIDI device not found:", deviceId);
@@ -53,10 +44,14 @@ function App() {
     },[deviceId]);
 
     useEffect(() => {
-        if (deviceId !== "0") {
-            getDevice();
+        getDeviceList();
+    },[getDeviceList]);
+
+    useEffect(() => {
+        if (deviceId !== "") {
+            connectToDevice();
         }
-    },[deviceId, getDevice]);
+    },[deviceId, connectToDevice]);
 
     function byteLog(array: number[]) {
         let string = "";
@@ -65,7 +60,7 @@ function App() {
         }
         string = string.toUpperCase();
         console.log(string);
-        toast.success("Sysex sent: " + string);
+        toast.success("SysEx sent: " + string);
     }
 
     function sendSysEx(sysExData: number[]) {
@@ -87,7 +82,7 @@ function App() {
 
     function handleChannelChange(event: SelectChangeEvent) {
         const _channel = event.target.value;
-        const success = sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel - 1, 0xF7]);
+        const success = sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0C, +_channel-1, 0xF7]);
         if (success) setChannel(_channel);
     }
 
@@ -106,26 +101,27 @@ function App() {
     function handleReboot() {
         sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0B, 0xF7]);
     }
+
     function handleCalibration() {
         sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0F, 0xF7]);
     }
+
     function handleQuickCalibration() {
         sendSysEx([0xF0, 0x7D, 0x08, 0x10, 0x0A, 0xF7]);
     }
 
-
     return (
         <main>
-            <Box sx={{ display: "flex", justifyContent: "center"}}>
-                <img src={Logo} alt="Michigan Synth Works logo" style={{width: 200, margin: "1em"}}/>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <img src={Logo} alt="Michigan Synth Works logo" style={{ width: 200, margin: "1em" }}/>
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "center", margin: 0}}>
+            <Box sx={{ display: "flex", justifyContent: "center", margin: 0 }}>
                 <span>MSW-810 Synthesizer MIDI configuration</span>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "center"}}>
-                <span style={{fontWeight: 700, fontSize: ".8em"}}>USE USB MIDI ONLY TO CONNECT</span>
+                <span style={{ fontWeight: 700, fontSize: ".8em" }}>USE USB MIDI ONLY TO CONNECT</span>
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "center"}}>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
                 <Box sx={{ paddingTop: 3, margin: 0 }}>
                     <IconButton onClick={getDeviceList}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-clockwise" viewBox="0 0 16 16">
@@ -140,13 +136,13 @@ function App() {
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            value={deviceId === "0" ? "" : deviceId}
+                            value={deviceId === "" ? "" : deviceId}
                             label="Device"
                             onChange={handleDeviceChange}
                         >
                             {
                                 deviceList.map((device, i) =>
-                                    <MenuItem key={i} value={device.value.id}>{device.value.name}</MenuItem>
+                                    <MenuItem key={i} value={device.id}>{device.name}</MenuItem>
                                 )
                             }
                         </Select>
@@ -156,8 +152,7 @@ function App() {
                 <Box sx={{ minWidth: 120, padding: 2 }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Channel</InputLabel>
-                        <Select
-                                
+                        <Select  
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value={channel.toString()}
@@ -217,12 +212,11 @@ function App() {
                             <MenuItem value={3}>3</MenuItem>
                             <MenuItem value={4}>4</MenuItem>
                             <MenuItem value={5}>5</MenuItem>
-
                         </Select>
                     </FormControl>
                 </Box>
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "center"}}>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
 
                 <Box sx={{ minWidth: 120, padding: 1 }}>
                     <Button variant="contained" onClick={handleReboot}>Reboot to Bootloader</Button>
