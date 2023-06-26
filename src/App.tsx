@@ -29,7 +29,7 @@ function App() {
             console.error(e);
             toast.error("ERROR: Could not get MIDI devices, make sure you are using a WebMIDI compatible browser.");
         }
-    },[]);
+    }, []);
 
     const connectToDevice = useCallback(async () => {
         const midi = await navigator.requestMIDIAccess({sysex: true});
@@ -41,17 +41,17 @@ function App() {
             console.error("MIDI device not found:", deviceId);
             toast.error("ERROR: MIDI device not found. Check console for details.");
         }
-    },[deviceId]);
+    }, [deviceId]);
 
     useEffect(() => {
         getDeviceList();
-    },[getDeviceList]);
+    }, [getDeviceList]);
 
     useEffect(() => {
         if (deviceId !== "") {
             connectToDevice();
         }
-    },[deviceId, connectToDevice]);
+    }, [deviceId, connectToDevice]);
 
     function byteLog(array: number[]) {
         let string = "";
